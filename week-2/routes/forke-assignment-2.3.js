@@ -8,11 +8,12 @@
 ;===========================================
 */
 
-//create express module
+//require statements
 var express = require("express");
 
 var http = require("http");
 
+//intialize the application
 var app = express();
 
 //routes
