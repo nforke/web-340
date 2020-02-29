@@ -4,7 +4,8 @@
 ;Author: Nicole Forke
 ;Date: 28 February 2020
 ;Modified By: Nicole Forke
-;Description: Hello World with Express
+;Description: Creates a new server and  listens
+;              on port 8080.
 ===========================================
 */
 
