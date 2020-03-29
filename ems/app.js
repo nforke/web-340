@@ -31,6 +31,18 @@ app.get("/", function(req, res) {
   });
 });
 
+app.get("/new", function(req, res) {
+  res.render("new", {
+    title: "Add Employee"
+  });
+});
+
+app.get("/list", function(req, res) {
+  res.render("list", {
+    title: "Employee Records"
+  });
+});
+
 //create the server and listen on port
 http.createServer(app).listen(8080, function() {
   console.log("Application started on port 8080!");
