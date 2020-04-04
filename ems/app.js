@@ -11,10 +11,25 @@
 //require statements
 var express = require("express");
 var http = require("http");
+var mongoose = require("mongoose");
 var path = require("path");
-
-//logger statement
 var logger = require("morgan");
+
+//map the EmployeeSchema to the employee model
+var employee = require("./models/employee");
+
+//mLab connection
+var mongoDB = "mongodb+srv://new_user:doodle-3@buwebdev-cluster-1-bznkj.mongodb.net/dev";
+mongoose.connect(mongoDB, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+mongoose.Promise = global.Promise;
+var db = mongoose.connection;
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
+db.once("open", function() {
+  console.log("Application connected to mLab MongoDB instance");
+})
 
 //app functions and to look inside views folder for any files
 var app = express();
