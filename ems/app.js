@@ -14,6 +14,7 @@ var http = require("http");
 var mongoose = require("mongoose");
 var path = require("path");
 var logger = require("morgan");
+var helmet = require("helmet");
 
 //map the EmployeeSchema to the employee model
 var employee = require("./models/employee");
@@ -31,15 +32,16 @@ db.once("open", function() {
   console.log("Application connected to mLab MongoDB instance");
 })
 
-//app functions and to look inside views folder for any files
+//app set statements and to look inside views folder for any files
 var app = express();
 app.set("views", path.resolve(__dirname, "views"));
 app.set("view engine", "ejs");
 
-//logger
+//use statements
 app.use(logger("short"));
+app.use(helmet.xssFilter());
 
-//route
+//route, http calls
 app.get("/", function(req, res) {
   res.render("index", {
     title: "Employee Records"
