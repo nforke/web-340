@@ -1,25 +1,32 @@
 /*
 ==================================================
-; Title:  Assignment 6.4
+; Title:  Assignment 8.3
 ; Author: Professor Krasso
 ; Modified By: Nicole Forke
-; Date:   28 March 2020
-; Description: User Interface using EJS templating
+; Date:   11 April 2020
+; Description: Server file for EMS project
 ;=================================================
 */
 
 //require statements
 var express = require("express");
 var http = require("http");
-var mongoose = require("mongoose");
 var path = require("path");
 var logger = require("morgan");
 var helmet = require("helmet");
+var bodyParser = require("body-parser");
+var cookieParser = require("cookie-parser");
+var csrf = require("csurf");
+var mongoose = require("mongoose");
+
 
 //map the EmployeeSchema to the employee model
-var employee = require("./models/employee");
+const employee = require("./models/employee");
 
-//mLab connection
+/**
+ * Establishes a database connection to MongoDB (mlab).
+ * Use the credentials of the "user" not  personal login info.
+ */
 var mongoDB = "mongodb+srv://new_user:doodle-3@buwebdev-cluster-1-bznkj.mongodb.net/dev";
 mongoose.connect(mongoDB, {
   useNewUrlParser: true,
@@ -30,37 +37,147 @@ var db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", function() {
   console.log("Application connected to mLab MongoDB instance");
-})
+});
 
-//app set statements and to look inside views folder for any files
+/**
+ * Setup CSRF protection
+ */
+var csrfProtection = csrf({cookie: true});
+
+/**
+ * Initialize the express application
+ */
 var app = express();
+
+/**
+ * Configures the dependency libraries.
+ */
+// Morgan logger
+app.use(logger("short"));
+
+// Body parser
+app.use(
+  bodyParser.urlencoded({
+    extended: true
+})
+);
+
+// Cookie parser
+app.use(cookieParser());
+
+// Helmet
+app.use(helmet.xssFilter());
+
+// CSRF protection
+app.use(csrfProtection);
+
+/**
+ * Intercepts all incoming requests and adds a CSRF token to the response.
+ */
+app.use(function(req, res, next) {
+  var token = req.csrfToken();
+  res.cookie('XSRF-TOKEN', token);
+  res.locals.csrfToken = token;
+  next();
+});
+
+/**
+ * Sets up the view engine, view's directory path, and the server port.
+ */
 app.set("views", path.resolve(__dirname, "views"));
 app.set("view engine", "ejs");
 
-//use statements
-app.use(logger("short"));
-app.use(helmet.xssFilter());
-
-//route, http calls
+/**
+ * Description: Redirects users to the 'index' page.
+ * Type: HttpGet
+ * Request: n/a
+ * Response: index.ejs, Employee
+ * URL: localhost:8080
+ */
 app.get("/", function(req, res) {
   res.render("index", {
     title: "Employee Records"
   });
 });
 
+/**
+ * Description: Redirects users to the 'new' page.
+ * Type: HttpGet
+ * Request: n/a
+ * Response: new.ejs
+ * URL: localhost:8080/new
+ */
 app.get("/new", function(req, res) {
   res.render("new", {
     title: "Add Employee"
   });
 });
 
+/**
+ * Description: Processes a form submission.
+ * Type: HttpPost
+ * Request: textName
+ * Response: index.ejs
+ * URL: localhost:8080/process
+ */
+app.post('/process', function(req, res) {
+  //console.log(request.body.txtName);
+  if (!req.body.txtName) {
+    res.status(400).send('Entries must have a name');
+    return;
+  }
+
+  if (!req.body.txtEmployeeId) {
+    res.status(400).send('Entries must have an id');
+    return;
+  }
+
+  if (!req.body.txtDepartment) {
+    res.status(400).send('Entries must have a department');
+    return;
+  }
+
+  //get the request's form data
+  const employeeName = req.body.txtName;
+  const employeeId = req.body.txtEmployeeId;
+  const employeeDept = req.body.txtDepartment;
+  console.log(employeeName + employeeId + employeeDept);
+
+  //create new employee model
+  let employee = new Employee({
+    name: employeeName,
+    id: employeeId,
+    dept: employeeDept
+  });
+
+  //save
+  employee.save(function(err) {
+    if (err) {
+      console.log(err);
+      throw err;
+    } else {
+      console.log(employeeName + employeeId + employeeDept + 'saved successfully!');
+      res.redirect('/');
+    }
+  });
+});
+
+/**
+ * Description: Redirects users to the 'list' page.
+ * Type: HttpGet
+ * Request: list.ejs
+ * Response: list.ejs
+ * URL: localhost:8080/list
+ */
 app.get("/list", function(req, res) {
   res.render("list", {
     title: "Employee Records"
   });
 });
 
-//create the server and listen on port
+/**
+ * Creates a new Node.js server and listens on port 8080.
+ */
 http.createServer(app).listen(8080, function() {
   console.log("Application started on port 8080!");
 });
