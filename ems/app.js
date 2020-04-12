@@ -19,9 +19,8 @@ var cookieParser = require("cookie-parser");
 var csrf = require("csurf");
 var mongoose = require("mongoose");
 
-
 //map the EmployeeSchema to the employee model
-const employee = require("./models/employee");
+const Employee = require("./models/employee");
 
 /**
  * Establishes a database connection to MongoDB (mlab).
@@ -86,6 +85,7 @@ app.use(function(req, res, next) {
  */
 app.set("views", path.resolve(__dirname, "views"));
 app.set("view engine", "ejs");
+app.set("port", process.env.PORT || 8080);
 
 /**
  * Description: Redirects users to the 'index' page.
@@ -95,8 +95,17 @@ app.set("view engine", "ejs");
  * URL: localhost:8080
  */
 app.get("/", function(req, res) {
-  res.render("index", {
-    title: "Employee Records"
+  Employee.find({}, function(err, employee) {
+    if (err) {
+      console.log(err);
+      throw err;
+    } else {
+      console.log(employee);
+      res.render("index", {
+        title: "Employee-Records",
+        employee: employee
+      })
+    }
   });
 });
 
@@ -121,42 +130,29 @@ app.get("/new", function(req, res) {
  * URL: localhost:8080/process
  */
 app.post('/process', function(req, res) {
-  //console.log(request.body.txtName);
-  if (!req.body.txtName) {
+  // console.log(request.body.txtName);
+
+  if (!req.body.Name) {
     res.status(400).send('Entries must have a name');
     return;
-  }
+  };
 
-  if (!req.body.txtEmployeeId) {
-    res.status(400).send('Entries must have an id');
-    return;
-  }
+  // get the request's form data
+  const employeeName = req.body.Name;
+  console.log(employeeName);
 
-  if (!req.body.txtDepartment) {
-    res.status(400).send('Entries must have a department');
-    return;
-  }
-
-  //get the request's form data
-  const employeeName = req.body.txtName;
-  const employeeId = req.body.txtEmployeeId;
-  const employeeDept = req.body.txtDepartment;
-  console.log(employeeName + employeeId + employeeDept);
-
-  //create new employee model
+  // create a employee model
   let employee = new Employee({
-    name: employeeName,
-    id: employeeId,
-    dept: employeeDept
+    name: Name
   });
 
-  //save
+  // save
   employee.save(function(err) {
     if (err) {
       console.log(err);
       throw err;
     } else {
-      console.log(employeeName + employeeId + employeeDept + 'saved successfully!');
+      console.log(employeeName + ' saved successfully!');
       res.redirect('/');
     }
   });
@@ -170,14 +166,28 @@ app.post('/process', function(req, res) {
  * URL: localhost:8080/list
  */
 app.get("/list", function(req, res) {
-  res.render("list", {
-    title: "Employee Records"
-  });
+  Employee.find({}, function(err, employee) {
+    if (err) {
+      console.log(err);
+      throw err;
+    } else {
+      console.log(employee);
+
+      if (employee.length > 0) {
+        res.render("list", {
+          title: "Employee-Records",
+          employee: employee
+        })
+      } else {
+        res.redirect("/");
+      }
+    }
+  })
 });
 
 /**
  * Creates a new Node.js server and listens on port 8080.
  */
-http.createServer(app).listen(8080, function() {
-  console.log("Application started on port 8080!");
+http.createServer(app).listen(app.get("port"), function() {
+  console.log("Application started on port " + app.get("port"));
 });

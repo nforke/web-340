@@ -3,30 +3,20 @@
 <html lang="en">
   <% include header %>
 
-  <body>
+  <body style="background-color: #eceff1;">
     <% include navbar %>
 
     <div role="main" class="container">
       <br /><br />
 
-      <h1 class="text-center" style="margin-top:0">Welcome to the Employee Records Database</h1>
+      <h2 class="container p-3 my-3 bg-dark text-white">Employees</h2>
       <br /><br />
 
+      <div class="container">
+        <% include list %>
+      </div>
+      <br /><br />
 
-        <h2>Employees</h2>
-      <br />
-      <a class="" href="/new">New Employee</a>
-      <br />
-
-
-
-
-    <br />
-    <div class="container">
-      <% include list %>
-    </div>
-
-    <br />
     </div>
     <% include footer %>
     <% include scripts %>
