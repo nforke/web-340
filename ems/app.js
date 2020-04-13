@@ -143,7 +143,7 @@ app.post('/process', function(req, res) {
 
   // create a employee model
   let employee = new Employee({
-    name: Name
+    Name: employeeName
   });
 
   // save
