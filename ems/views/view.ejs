@@ -1,3 +1,27 @@
-<div class="container">
-  <h1 class="text-center" style="margin-top:0 font-weight-bold">EMS Project</h1>
-</div>
+
+<!DOCTYPE html>
+<html lang="en">
+  <% include header %>
+
+  <body style="background-color: #eceff1;">
+    <% include navbar %>
+
+    <div role="main" class="container" style="width: 50%";>
+      <br /><br />
+      <h2 class="container p-3 my-3 bg-dark text-white text-center" style="margin-top:0 font-weight-bold">Employee Records</h2>
+
+      <div>
+        <div class="form-group">
+          <label for="txtName">Name:</label>
+          <input type="text" class="form-control" id="txtName" readonly value="<%= employee[0].Name %>" name="txtName" />
+        </div>
+      </div>
+      <br /><br />
+
+      <a class="btn btn-secondary float-left" href="/">&larr;OK</a>
+    </div>
+
+    <% include scripts %>
+
+  </body>
+</html>

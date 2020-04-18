@@ -186,6 +186,36 @@ app.get("/list", function(req, res) {
 });
 
 /**
+ * Description: Redirects users to the 'view' page.
+ * Type: HttpGet
+ * Request: view.ejs
+ * Response: view.ejs, Employee [] | index.ejs
+ * URL: localhost:8080/view
+ */
+
+ app.get("/view/:Name", function(req, res) {
+   var employeeName = req.params["Name"];
+
+   Employee.find({"Name": employeeName}, function(err, employee){
+     if (err) {
+       console.log(err);
+       throw err;
+     } else {
+       console.log(employee);
+
+       if (employee.length > 0) {
+         res.render("view", {
+           title: "Employee View",
+           employee: employee
+         })
+       } else {
+         res.redirect("/");
+       }
+     }
+   })
+ });
+
+/**
  * Creates a new Node.js server and listens on port 8080.
  */
 http.createServer(app).listen(app.get("port"), function() {

@@ -1,3 +1,8 @@
+<div role="main" class="container" style="width: 75%;">
+  <br /><br />
+
+  <h3> Employee Listing</h3>
+
 <% if (employee.length) { %>
 
 <!-- Employee list to insert into index file -->
@@ -5,6 +10,7 @@
   <thead>
     <tr>
       <th>Name</th>
+      <th>Functions</th>
     </tr>
   </thead>
 
@@ -13,14 +19,16 @@
     <tr>
       <td><%= entry.Name %></td>
       <td style="width: 10%; text-align: center;">
-        <a style="color: #555">
+        <a style="color: #fff" href="/view/<%= entry.Name %>">View
           <i class="fa fa-pencil fa-fw" aria-hidden="true"></i>
         </a>
       </td>
     </tr>
   <% }) %>
+  </tbody>
+  </table>
 <% } else { %>
 No entries! <a class="btn btn-secondary float-right" href="/new"> Add one!</a>
 <% } %>
-  </tbody>
-</table>
+  <br />
+</div>
